@@ -1,0 +1,7 @@
+"""Production layered architecture with MongoDB, Redis, Elasticsearch."""
+
+from __future__ import annotations
+
+from typing import Final
+
+__version__: Final[str] = "0.1.0"
