@@ -1,7 +1,6 @@
-"""Integration tests for MongoDB repository.
+"""Integration tests for MongoDB repository using testcontainers.
 
-These tests require a running MongoDB instance.
-Run with: docker-compose up -d mongodb
+These tests use testcontainers to spin up a real MongoDB instance.
 """
 
 from __future__ import annotations

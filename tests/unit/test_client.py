@@ -1,4 +1,4 @@
-"""Tests for client module."""
+"""Unit tests for client module."""
 
 from __future__ import annotations
 

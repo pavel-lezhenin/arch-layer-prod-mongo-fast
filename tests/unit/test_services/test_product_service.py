@@ -1,4 +1,4 @@
-"""Tests for product service."""
+"""Unit tests for product service with mocked repositories."""
 
 from __future__ import annotations
 

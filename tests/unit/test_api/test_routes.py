@@ -1,4 +1,4 @@
-"""API route tests with mocked service.
+"""API route unit tests with mocked service.
 
 Uses mock ProductService to test API routes in isolation.
 No testcontainers needed - pure unit tests for HTTP layer.

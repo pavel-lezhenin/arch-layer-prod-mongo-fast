@@ -292,24 +292,55 @@ GET /api/v1/products/123
 
 ## 🧪 Testing
 
-Run tests with coverage:
+Tests are organized into two categories:
+
+### Test Structure
+
+```
+tests/
+├── unit/                          # Fast tests with mocks
+│   ├── test_api/                  # API route tests (mocked service)
+│   ├── test_services/             # Service tests (mocked repositories)
+│   ├── test_client.py            # HTTP client tests
+│   ├── test_config.py            # Configuration tests
+│   ├── test_exceptions.py        # Exception tests
+│   └── test_models.py            # Model/schema tests
+│
+└── integration/                   # Slow tests with real containers
+    ├── test_repositories/         # Repository tests (testcontainers)
+    │   ├── test_mongo_repository.py
+    │   ├── test_redis_repository.py
+    │   └── test_elastic_repository.py
+    └── test_main.py               # Application lifecycle tests
+```
+
+### Running Tests
 
 ```bash
+# Run all tests
 pytest
+
+# Run only unit tests (fast, no Docker needed)
+pytest tests/unit
+
+# Run only integration tests (requires Docker)
+pytest tests/integration
+
+# Run with coverage
+pytest --cov --cov-report=html
 ```
 
-Run specific test layers:
+### Testing Philosophy
 
-```bash
-# Test repositories only
-pytest tests/test_repositories/
+| Layer | Test Type | Uses |
+|-------|-----------|------|
+| API Routes | Unit | Mocked ProductService |
+| Services | Unit | Mocked Repositories |
+| Repositories | Integration | Testcontainers (real DB) |
+| Models | Unit | Direct instantiation |
 
-# Test services only
-pytest tests/test_services/
-
-# Test API only
-pytest tests/test_api/
-```
+**Unit tests** are fast (~7s) and don't require Docker.
+**Integration tests** use testcontainers to spin up real MongoDB, Redis, and Elasticsearch instances.
 
 ## 🛠️ Development
 
@@ -317,7 +348,7 @@ pytest tests/test_api/
 ruff check .      # Linting
 ruff format .     # Formatting
 mypy src          # Type checking
-pytest            # Tests with 100% coverage
+pytest tests/unit # Fast tests
 bandit src        # Security scan
 ```
 
@@ -343,6 +374,21 @@ src/arch_layer_prod_mongo_fast/
 ├── config.py               # Settings (pydantic-settings)
 ├── exceptions.py           # Custom exceptions
 └── main.py                # FastAPI app entry point
+
+tests/
+├── unit/                   # Fast tests (mocks)
+│   ├── test_api/          # API route tests
+│   ├── test_services/     # Service tests
+│   ├── test_client.py     # HTTP client tests
+│   ├── test_config.py     # Config tests
+│   └── test_models.py     # Model tests
+│
+└── integration/           # Slow tests (testcontainers)
+    ├── test_repositories/ # Repository tests
+    │   ├── test_mongo_repository.py
+    │   ├── test_redis_repository.py
+    │   └── test_elastic_repository.py
+    └── test_main.py       # Application lifecycle
 
 compose.yml               # Infrastructure services
 seed_data.py              # Demo data script

@@ -1,4 +1,4 @@
-"""Tests for product model."""
+"""Unit tests for product model."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Tests for API dependencies.
+"""Integration tests for API dependencies.
 
 Uses testcontainers for isolated service instances.
 """
@@ -32,7 +32,7 @@ class TestMongoRepoDependency:
     @pytest.mark.asyncio
     async def test_get_mongo_repo_returns_instance(
         self,
-        mongo_database: str,
+        mongo_database: str,  # noqa: ARG002
     ) -> None:
         """Test that get_mongo_repo returns MongoRepository instance."""
         repo = await get_mongo_repo()
