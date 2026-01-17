@@ -53,7 +53,7 @@ This package demonstrates a **classic 3-tier layered architecture** designed for
 - ✅ **Search integration** - Automatic Elasticsearch indexing
 - ✅ **Demo data** - Seed script with realistic product data
 - ✅ **OpenAPI docs** - Auto-generated via FastAPI
-- ✅ **100% test coverage** - Comprehensive test suite
+- ✅ **80%+ test coverage** - Comprehensive test suite
 
 ## 📦 Installation
 
@@ -419,7 +419,7 @@ ELASTICSEARCH_INDEX=products
 ## 📋 Standards
 
 - ✅ Strict typing (mypy strict)
-- ✅ 100% test coverage
+- ✅ 80%+ test coverage
 - ✅ Auto-formatting (ruff)
 - ✅ Secret detection
 - ✅ English only (code, comments, docs)

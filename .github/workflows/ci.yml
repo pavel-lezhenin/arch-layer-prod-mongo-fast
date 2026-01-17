@@ -57,9 +57,10 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run unit tests with coverage
-        run: pytest tests/unit -v --cov --cov-report=term-missing
-        env:
-          COVERAGE_FILE: .coverage.unit
+        run: |
+          coverage run -m pytest tests/unit -v
+          coverage report
+          mv .coverage .coverage.unit
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -78,9 +79,10 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run integration tests with coverage
-        run: pytest tests/integration -v --cov --cov-report=term-missing
-        env:
-          COVERAGE_FILE: .coverage.integration
+        run: |
+          coverage run -m pytest tests/integration -v
+          coverage report
+          mv .coverage .coverage.integration
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
