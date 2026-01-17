@@ -125,7 +125,7 @@ omit = ["**/tests/*", "**/__init__.py"]
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 80
+# fail_under checked in CI after combining unit + integration coverage
 exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
