@@ -7,6 +7,7 @@ containers for each test session - ensuring tests don't affect real data.
 from __future__ import annotations
 
 import contextlib
+import time
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -15,7 +16,8 @@ from beanie import init_beanie
 from elasticsearch import AsyncElasticsearch
 from motor.motor_asyncio import AsyncIOMotorClient
 from redis.asyncio import Redis
-from testcontainers.elasticsearch import ElasticSearchContainer
+from testcontainers.core.container import DockerContainer
+from testcontainers.core.wait_strategies import LogMessageWaitStrategy
 from testcontainers.mongodb import MongoDbContainer
 from testcontainers.redis import RedisContainer
 
@@ -55,12 +57,23 @@ def redis_container() -> Iterator[RedisContainer]:
 
 
 @pytest.fixture(scope="session")
-def elasticsearch_container() -> Iterator[ElasticSearchContainer]:
-    """Start Elasticsearch container for test session."""
-    with ElasticSearchContainer(
-        "docker.elastic.co/elasticsearch/elasticsearch:8.15.0",
-    ).with_env("xpack.security.enabled", "false") as es:
-        yield es
+def elasticsearch_container() -> Iterator[DockerContainer]:
+    """Start Elasticsearch 9.x container for test session.
+
+    Note: testcontainers.elasticsearch doesn't support ES 9 yet,
+    so we use DockerContainer directly.
+    """
+    container = (
+        DockerContainer("docker.elastic.co/elasticsearch/elasticsearch:9.0.0")
+        .with_exposed_ports(9200)
+        .with_env("discovery.type", "single-node")
+        .with_env("xpack.security.enabled", "false")
+        .waiting_for(LogMessageWaitStrategy("started").with_startup_timeout(120))
+    )
+    with container:
+        # Additional wait for HTTP to be fully available
+        time.sleep(2)
+        yield container
 
 
 # =============================================================================
@@ -107,7 +120,7 @@ async def redis_client(
 
 @pytest.fixture
 async def elasticsearch_client(
-    elasticsearch_container: ElasticSearchContainer,
+    elasticsearch_container: DockerContainer,
 ) -> AsyncIterator[AsyncElasticsearch]:
     """Create async Elasticsearch client connected to test container."""
     host = elasticsearch_container.get_container_host_ip()
