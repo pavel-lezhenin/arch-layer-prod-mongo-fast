@@ -10,6 +10,7 @@ from bson import Decimal128
 from arch_layer_prod_mongo_fast.models.product import (
     Product,
     ProductCreate,
+    ProductResponse,
     ProductUpdate,
 )
 
@@ -83,6 +84,79 @@ class TestProductValidators:
         """Test converting float to Decimal."""
         result = Product.convert_decimal128(99.99)
         assert isinstance(result, Decimal)
+        assert result == Decimal("99.99")
+
+    def test_convert_decimal128_with_float(self) -> None:
+        """Test converting float to Decimal."""
+        result = Product.convert_decimal128(99.99)
+        assert isinstance(result, Decimal)
+
+
+class TestProductResponse:
+    """Tests for ProductResponse serialization."""
+
+    def test_price_serialization_two_decimal_places(self) -> None:
+        """Test that price is serialized as string with 2 decimal places."""
+        from datetime import UTC, datetime
+
+        response = ProductResponse(
+            id="123",
+            name="Test Product",
+            description="Test description",
+            price=Decimal("99.99"),
+            stock=10,
+            category="Electronics",
+            is_active=True,
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+        )
+
+        # Serialize to dict (as would happen in API response)
+        data = response.model_dump(mode="json")
+        assert data["price"] == "99.99"
+        assert isinstance(data["price"], str)
+
+    def test_price_serialization_rounds_correctly(self) -> None:
+        """Test that price with more decimals is rounded to 2 places."""
+        from datetime import UTC, datetime
+
+        response = ProductResponse(
+            id="123",
+            name="Test Product",
+            description=None,
+            price=Decimal("99.996"),
+            stock=0,
+            category="Test",
+            is_active=True,
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+        )
+
+        data = response.model_dump(mode="json")
+        assert data["price"] == "100.00"
+
+    def test_price_serialization_adds_trailing_zeros(self) -> None:
+        """Test that price with 1 decimal gets trailing zero."""
+        from datetime import UTC, datetime
+
+        response = ProductResponse(
+            id="123",
+            name="Test Product",
+            description=None,
+            price=Decimal("50.5"),
+            stock=0,
+            category="Test",
+            is_active=True,
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+        )
+
+        data = response.model_dump(mode="json")
+        assert data["price"] == "50.50"
+
+
+class TestSerializeId:
+    """Tests for serialize_id method."""
 
     def test_serialize_id_with_none(self) -> None:
         """Test serializing None id returns None."""

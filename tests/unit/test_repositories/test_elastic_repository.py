@@ -82,6 +82,50 @@ class TestSearchError:
             await elastic_repo.search("query")
 
 
+class TestSearchByCategory:
+    """Tests for search_by_category functionality."""
+
+    async def test_search_by_category_lowercase_conversion(
+        self,
+        elastic_repo: ElasticRepository,
+        mock_es_client: MagicMock,
+    ) -> None:
+        """Should convert category to lowercase for case-insensitive search."""
+        mock_response = {
+            "hits": {
+                "hits": [
+                    {"_source": {"id": "1", "name": "Product 1", "category": "Electronics"}},
+                    {"_source": {"id": "2", "name": "Product 2", "category": "electronics"}},
+                ]
+            }
+        }
+        mock_es_client.search = AsyncMock(return_value=mock_response)
+
+        # Test with uppercase
+        results = await elastic_repo.search_by_category("Furniture")
+        assert len(results) == 2
+
+        # Verify query uses lowercase
+        call_args = mock_es_client.search.call_args
+        assert call_args[1]["body"]["query"]["term"]["category"] == "furniture"
+
+    async def test_search_by_category_preserves_lowercase(
+        self,
+        elastic_repo: ElasticRepository,
+        mock_es_client: MagicMock,
+    ) -> None:
+        """Should work correctly with already lowercase category."""
+        mock_response = {"hits": {"hits": [{"_source": {"id": "1", "category": "electronics"}}]}}
+        mock_es_client.search = AsyncMock(return_value=mock_response)
+
+        results = await elastic_repo.search_by_category("electronics")
+        assert len(results) == 1
+
+        # Verify lowercase is preserved
+        call_args = mock_es_client.search.call_args
+        assert call_args[1]["body"]["query"]["term"]["category"] == "electronics"
+
+
 class TestSearchByCategoryError:
     """Tests for search_by_category error handling."""
 
