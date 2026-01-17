@@ -27,6 +27,7 @@ jobs:
         with:
           python-version: "3.14"
           allow-prereleases: true
+          cache: "pip"
       - run: pip install -e ".[dev]"
       - run: mypy src
 
@@ -50,6 +51,7 @@ jobs:
         with:
           python-version: "3.14"
           allow-prereleases: true
+          cache: "pip"
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run unit tests
@@ -63,6 +65,7 @@ jobs:
         with:
           python-version: "3.14"
           allow-prereleases: true
+          cache: "pip"
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run integration tests
@@ -81,6 +84,7 @@ jobs:
         with:
           python-version: "3.14"
           allow-prereleases: true
+          cache: "pip"
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run all tests with coverage
