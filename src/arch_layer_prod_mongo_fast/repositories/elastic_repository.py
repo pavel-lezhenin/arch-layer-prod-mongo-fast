@@ -30,6 +30,16 @@ class ElasticRepository:
     async def create_index(self) -> None:
         """Create index with product mapping."""
         mapping = {
+            "settings": {
+                "analysis": {
+                    "normalizer": {
+                        "lowercase_normalizer": {
+                            "type": "custom",
+                            "filter": ["lowercase"],
+                        }
+                    }
+                }
+            },
             "mappings": {
                 "properties": {
                     "id": {"type": "keyword"},
@@ -40,7 +50,10 @@ class ElasticRepository:
                     "description": {"type": "text"},
                     "price": {"type": "scaled_float", "scaling_factor": 100},
                     "stock": {"type": "integer"},
-                    "category": {"type": "keyword"},
+                    "category": {
+                        "type": "keyword",
+                        "normalizer": "lowercase_normalizer",
+                    },
                     "is_active": {"type": "boolean"},
                     "created_at": {"type": "date"},
                     "updated_at": {"type": "date"},
@@ -118,9 +131,13 @@ class ElasticRepository:
         category: str,
         size: int = 100,
     ) -> list[dict[str, Any]]:
-        """Search products by category."""
+        """Search products by category (case-insensitive)."""
         search_query = {
-            "query": {"term": {"category": category}},
+            "query": {
+                "term": {
+                    "category": category.lower(),
+                }
+            },
             "size": size,
         }
 

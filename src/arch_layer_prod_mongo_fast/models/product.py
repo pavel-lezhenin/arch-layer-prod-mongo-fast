@@ -58,7 +58,12 @@ class ProductCreate(BaseModel):
 
     name: str = Field(..., min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=2000)
-    price: Decimal = Field(..., gt=0, decimal_places=2)
+    price: Decimal = Field(
+        ...,
+        gt=0,
+        decimal_places=2,
+        json_schema_extra={"example": "99.99"},
+    )
     stock: int = Field(default=0, ge=0)
     category: str = Field(..., min_length=1, max_length=100)
     is_active: bool = Field(default=True)
@@ -69,7 +74,12 @@ class ProductUpdate(BaseModel):
 
     name: str | None = Field(default=None, min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=2000)
-    price: Decimal | None = Field(default=None, gt=0, decimal_places=2)
+    price: Decimal | None = Field(
+        default=None,
+        gt=0,
+        decimal_places=2,
+        json_schema_extra={"example": "99.99"},
+    )
     stock: int | None = Field(default=None, ge=0)
     category: str | None = Field(default=None, min_length=1, max_length=100)
     is_active: bool | None = None
@@ -83,9 +93,15 @@ class ProductResponse(BaseModel):
     id: str
     name: str
     description: str | None
-    price: Decimal
+    price: Decimal = Field(json_schema_extra={"example": "99.99"})
     stock: int
     category: str
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+    @field_serializer("price")
+    @classmethod
+    def serialize_price(cls, v: Decimal) -> str:
+        """Serialize Decimal to string with 2 decimal places."""
+        return f"{v:.2f}"
