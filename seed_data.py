@@ -1,4 +1,4 @@
-"""Script to seed demo data into MongoDB."""
+"""Script to seed demo data into MongoDB and Elasticsearch."""
 
 from __future__ import annotations
 
@@ -6,20 +6,40 @@ import asyncio
 from decimal import Decimal
 
 from beanie import init_beanie
+from elasticsearch import AsyncElasticsearch
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from redis.asyncio import Redis
 
 from arch_layer_prod_mongo_fast.config import get_settings
 from arch_layer_prod_mongo_fast.models.product import Product, ProductCreate
+from arch_layer_prod_mongo_fast.repositories.elastic_repository import (
+    ElasticRepository,
+)
+from arch_layer_prod_mongo_fast.repositories.mongo_repository import MongoRepository
+from arch_layer_prod_mongo_fast.repositories.redis_repository import RedisRepository
+from arch_layer_prod_mongo_fast.services.product_service import ProductService
 
 
 async def seed_demo_data() -> None:
     """Seed database with demo product data."""
     settings = get_settings()
 
+    # Initialize MongoDB
     client: AsyncIOMotorClient = AsyncIOMotorClient(settings.mongodb_uri)  # type: ignore[type-arg]
     database: AsyncIOMotorDatabase = client[settings.mongodb_database]  # type: ignore[type-arg]
-
     await init_beanie(database=database, document_models=[Product])  # type: ignore[arg-type]
+
+    # Initialize Redis and Elasticsearch
+    redis_client = Redis.from_url(settings.redis_uri, decode_responses=True)
+    es_client = AsyncElasticsearch([settings.elasticsearch_uri])
+
+    # Create repositories
+    mongo_repo = MongoRepository()
+    redis_repo = RedisRepository(redis_client)
+    elastic_repo = ElasticRepository(es_client, "products")
+
+    # Create service
+    product_service = ProductService(mongo_repo, redis_repo, elastic_repo)
 
     demo_products = [
         ProductCreate(
@@ -111,15 +131,22 @@ async def seed_demo_data() -> None:
 
     count = await Product.count()
     if count > 0:
+        print(f"Database already contains {count} products. Skipping seed.")
+        await es_client.close()
+        await redis_client.aclose()
         client.close()
         return
 
-    for product_data in demo_products:
-        product = Product(**product_data.model_dump())
-        await product.insert()
+    print(f"Seeding {len(demo_products)} products...")
+    for i, product_data in enumerate(demo_products, 1):
+        await product_service.create(product_data)
+        print(f"  [{i}/{len(demo_products)}] Created: {product_data.name}")
 
-    await Product.count()
+    total = await Product.count()
+    print(f"✅ Successfully seeded {total} products into MongoDB and Elasticsearch")
 
+    await es_client.close()
+    await redis_client.aclose()
     client.close()
 
 
