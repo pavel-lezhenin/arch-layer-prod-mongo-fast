@@ -84,3 +84,14 @@ class TestClient:
 
         with pytest.raises(RuntimeError, match="Client not initialized"):
             await client.get("/test")
+
+    @pytest.mark.asyncio
+    async def test_context_manager_exit_with_exception(self):
+        """Test context manager exit when exception occurs."""
+        try:
+            async with Client() as client:
+                assert client._client is not None  # noqa: SLF001
+                msg = "Test exception"
+                raise ValueError(msg)
+        except ValueError:
+            pass
