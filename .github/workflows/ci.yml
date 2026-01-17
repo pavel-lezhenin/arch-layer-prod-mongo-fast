@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run unit tests
-        run: pytest tests/unit -v
+        run: pytest tests/unit -v --no-cov
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run integration tests
-        run: pytest tests/integration -v
+        run: pytest tests/integration -v --no-cov
 
   tests:
     runs-on: ubuntu-latest
