@@ -2,6 +2,7 @@
 
 Uses mock ProductService to test API routes in isolation.
 No testcontainers needed - pure unit tests for HTTP layer.
+Uses a test app without lifespan to avoid MongoDB connections.
 """
 
 from __future__ import annotations
@@ -12,14 +13,28 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from arch_layer_prod_mongo_fast.api.dependencies import get_product_service
+from arch_layer_prod_mongo_fast.api.routes import router
 from arch_layer_prod_mongo_fast.exceptions import NotFoundError
-from arch_layer_prod_mongo_fast.main import app
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+
+
+def create_test_app() -> FastAPI:
+    """Create a test FastAPI app without lifespan (no MongoDB connection)."""
+    test_app = FastAPI(title="Test App")
+    test_app.include_router(router)
+
+    @test_app.get("/", tags=["health"])
+    async def root() -> dict[str, str]:
+        """Health check endpoint."""
+        return {"status": "ok", "message": "Layered Architecture API"}
+
+    return test_app
 
 
 def create_mock_product(
@@ -68,7 +83,8 @@ def mock_service() -> MagicMock:
 
 @pytest.fixture
 def test_client(mock_service: MagicMock) -> Generator[TestClient]:
-    """Create test client with mocked service."""
+    """Create test client with mocked service and no lifespan."""
+    app = create_test_app()
 
     async def override_get_product_service() -> MagicMock:
         return mock_service
