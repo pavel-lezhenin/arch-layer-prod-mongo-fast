@@ -69,6 +69,7 @@ def mock_service() -> MagicMock:
 @pytest.fixture
 def test_client(mock_service: MagicMock) -> Generator[TestClient]:
     """Create test client with mocked service."""
+
     async def override_get_product_service() -> MagicMock:
         return mock_service
 
