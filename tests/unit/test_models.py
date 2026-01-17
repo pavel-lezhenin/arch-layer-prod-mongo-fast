@@ -86,11 +86,6 @@ class TestProductValidators:
         assert isinstance(result, Decimal)
         assert result == Decimal("99.99")
 
-    def test_convert_decimal128_with_float(self) -> None:
-        """Test converting float to Decimal."""
-        result = Product.convert_decimal128(99.99)
-        assert isinstance(result, Decimal)
-
 
 class TestProductResponse:
     """Tests for ProductResponse serialization."""

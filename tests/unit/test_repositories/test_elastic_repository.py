@@ -31,7 +31,9 @@ class TestCreateIndexError:
         mock_es_client: MagicMock,
     ) -> None:
         """Should raise SearchError when index creation fails."""
-        mock_es_client.indices.exists = AsyncMock(side_effect=Exception("Connection failed"))
+        mock_es_client.indices.exists = AsyncMock(
+            side_effect=Exception("Connection failed")
+        )
 
         with pytest.raises(SearchError, match="Failed to create index"):
             await elastic_repo.create_index()
@@ -94,8 +96,20 @@ class TestSearchByCategory:
         mock_response = {
             "hits": {
                 "hits": [
-                    {"_source": {"id": "1", "name": "Product 1", "category": "Electronics"}},
-                    {"_source": {"id": "2", "name": "Product 2", "category": "electronics"}},
+                    {
+                        "_source": {
+                            "id": "1",
+                            "name": "Product 1",
+                            "category": "Electronics",
+                        }
+                    },
+                    {
+                        "_source": {
+                            "id": "2",
+                            "name": "Product 2",
+                            "category": "electronics",
+                        }
+                    },
                 ]
             }
         }
@@ -115,7 +129,9 @@ class TestSearchByCategory:
         mock_es_client: MagicMock,
     ) -> None:
         """Should work correctly with already lowercase category."""
-        mock_response = {"hits": {"hits": [{"_source": {"id": "1", "category": "electronics"}}]}}
+        mock_response = {
+            "hits": {"hits": [{"_source": {"id": "1", "category": "electronics"}}]}
+        }
         mock_es_client.search = AsyncMock(return_value=mock_response)
 
         results = await elastic_repo.search_by_category("electronics")
@@ -135,7 +151,9 @@ class TestSearchByCategoryError:
         mock_es_client: MagicMock,
     ) -> None:
         """Should raise SearchError when category search fails."""
-        mock_es_client.search = AsyncMock(side_effect=Exception("Category search failed"))
+        mock_es_client.search = AsyncMock(
+            side_effect=Exception("Category search failed")
+        )
 
         with pytest.raises(SearchError, match="Failed to search by category"):
             await elastic_repo.search_by_category("electronics")
@@ -189,7 +207,9 @@ class TestDeleteIndexError:
         mock_es_client: MagicMock,
     ) -> None:
         """Should raise SearchError when index deletion fails."""
-        mock_es_client.indices.delete = AsyncMock(side_effect=Exception("Delete index failed"))
+        mock_es_client.indices.delete = AsyncMock(
+            side_effect=Exception("Delete index failed")
+        )
 
         with pytest.raises(SearchError, match="Failed to delete index"):
             await elastic_repo.delete_index()

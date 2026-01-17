@@ -32,7 +32,7 @@ class TestMongoRepoDependency:
     @pytest.mark.asyncio
     async def test_get_mongo_repo_returns_instance(
         self,
-        mongo_database: str,  # noqa: ARG002
+        mongo_database: str,
     ) -> None:
         """Test that get_mongo_repo returns MongoRepository instance."""
         repo = await get_mongo_repo()

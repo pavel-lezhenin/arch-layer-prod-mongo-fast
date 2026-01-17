@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from decimal import Decimal
 
 from beanie import init_beanie
@@ -129,21 +130,22 @@ async def seed_demo_data() -> None:
         ),
     ]
 
+    logger = logging.getLogger(__name__)
     count = await Product.count()
     if count > 0:
-        print(f"Database already contains {count} products. Skipping seed.")
+        logger.info("Database already contains %d products. Skipping seed.", count)
         await es_client.close()
         await redis_client.aclose()
         client.close()
         return
 
-    print(f"Seeding {len(demo_products)} products...")
+    logger.info("Seeding %d products...", len(demo_products))
     for i, product_data in enumerate(demo_products, 1):
         await product_service.create(product_data)
-        print(f"  [{i}/{len(demo_products)}] Created: {product_data.name}")
+        logger.info("  [%d/%d] Created: %s", i, len(demo_products), product_data.name)
 
     total = await Product.count()
-    print(f"✅ Successfully seeded {total} products into MongoDB and Elasticsearch")
+    logger.info("Successfully seeded %d products into MongoDB and Elasticsearch", total)
 
     await es_client.close()
     await redis_client.aclose()
@@ -151,4 +153,5 @@ async def seed_demo_data() -> None:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     asyncio.run(seed_demo_data())

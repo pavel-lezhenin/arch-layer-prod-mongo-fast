@@ -88,10 +88,14 @@ class TestClient:
     @pytest.mark.asyncio
     async def test_context_manager_exit_with_exception(self):
         """Test context manager exit when exception occurs."""
+
+        def _raise_error() -> None:
+            msg = "Test exception"
+            raise ValueError(msg)
+
         try:
             async with Client() as client:
                 assert client._client is not None  # noqa: SLF001
-                msg = "Test exception"
-                raise ValueError(msg)
+                _raise_error()
         except ValueError:
             pass
