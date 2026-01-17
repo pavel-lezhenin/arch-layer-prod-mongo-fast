@@ -3,16 +3,22 @@
 ## Start the Stack
 
 ```bash
-# 1. Start infrastructure
+# 1. Clean up old volumes (if upgrading from ES 8.x)
+docker compose down -v
+
+# 2. Start infrastructure
 docker compose up -d
 
-# 2. Install package
+# 3. Wait for services to be healthy (~30 seconds)
+docker compose ps
+
+# 4. Install package
 pip install -e '.[dev]'
 
-# 3. Seed demo data
+# 5. Seed demo data
 python seed_data.py
 
-# 4. Run API server
+# 6. Run API server
 uvicorn arch_layer_prod_mongo_fast.main:app --reload
 ```
 
