@@ -57,9 +57,9 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run unit tests with coverage
-        run: |
-          coverage run -p -m pytest tests/unit -v -p no:cov
-          shopt -s nullglob; for f in .coverage.*.*; do mv "$f" .coverage.unit; done
+        env:
+          COVERAGE_FILE: .coverage.unit
+        run: coverage run -m pytest tests/unit -v -p no:cov
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -78,9 +78,9 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run integration tests with coverage
-        run: |
-          coverage run -p -m pytest tests/integration -v -p no:cov
-          shopt -s nullglob; for f in .coverage.*.*; do mv "$f" .coverage.integration; done
+        env:
+          COVERAGE_FILE: .coverage.integration
+        run: coverage run -m pytest tests/integration -v -p no:cov
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
