@@ -60,12 +60,6 @@ jobs:
         env:
           COVERAGE_FILE: .coverage.unit
         run: coverage run -m pytest tests/unit -v -p no:cov
-      - name: Verify coverage file exists
-        run: |
-          pwd
-          ls -la
-          ls -la .coverage* || echo "No coverage files found"
-          test -f .coverage.unit && echo "File exists" || echo "File does NOT exist"
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -89,12 +83,6 @@ jobs:
         env:
           COVERAGE_FILE: .coverage.integration
         run: coverage run -m pytest tests/integration -v -p no:cov
-      - name: Verify coverage file exists
-        run: |
-          pwd
-          ls -la
-          ls -la .coverage* || echo "No coverage files found"
-          test -f .coverage.integration && echo "File exists" || echo "File does NOT exist"
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
