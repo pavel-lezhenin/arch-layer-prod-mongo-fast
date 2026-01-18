@@ -59,12 +59,15 @@ jobs:
       - name: Run unit tests with coverage
         env:
           COVERAGE_FILE: .coverage.unit
-        run: coverage run -m pytest tests/unit -v -p no:cov
+        run: |
+          coverage run -m pytest tests/unit -v -p no:cov
+          ls -la .coverage* || echo "No coverage files found"
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-unit
           path: .coverage.unit
+          if-no-files-found: error
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -80,12 +83,15 @@ jobs:
       - name: Run integration tests with coverage
         env:
           COVERAGE_FILE: .coverage.integration
-        run: coverage run -m pytest tests/integration -v -p no:cov
+        run: |
+          coverage run -m pytest tests/integration -v -p no:cov
+          ls -la .coverage* || echo "No coverage files found"
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-integration
           path: .coverage.integration
+          if-no-files-found: error
 
   coverage:
     runs-on: ubuntu-latest
