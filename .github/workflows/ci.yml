@@ -42,6 +42,7 @@ jobs:
       - run: pip install bandit
       - run: bandit -r src -c pyproject.toml
       - uses: gitleaks/gitleaks-action@v2
+        if: github.event_name != 'repository_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
