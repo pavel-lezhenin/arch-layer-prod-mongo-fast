@@ -60,7 +60,7 @@ jobs:
         run: |
           coverage run -p -m pytest tests/unit -v -p no:cov
           coverage report
-          mv .coverage.* .coverage.unit
+          shopt -s nullglob; for f in .coverage.*.*; do mv "$f" .coverage.unit; done
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -82,7 +82,7 @@ jobs:
         run: |
           coverage run -p -m pytest tests/integration -v -p no:cov
           coverage report
-          mv .coverage.* .coverage.integration
+          shopt -s nullglob; for f in .coverage.*.*; do mv "$f" .coverage.integration; done
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
