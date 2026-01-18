@@ -58,9 +58,9 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Run unit tests with coverage
         run: |
-          coverage run -m pytest tests/unit -v
+          coverage run -p -m pytest tests/unit -v -p no:cov
           coverage report
-          mv .coverage .coverage.unit
+          mv .coverage.* .coverage.unit
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -80,9 +80,9 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Run integration tests with coverage
         run: |
-          coverage run -m pytest tests/integration -v
+          coverage run -p -m pytest tests/integration -v -p no:cov
           coverage report
-          mv .coverage .coverage.integration
+          mv .coverage.* .coverage.integration
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
