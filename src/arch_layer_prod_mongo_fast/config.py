@@ -15,12 +15,27 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
+    # Application
     app_title: str = Field(
         default="Layered Architecture Demo",
         description="Application title",
     )
     app_version: str = Field(default="0.1.0", description="Application version")
     app_debug: bool = Field(default=False, description="Debug mode")
+
+    # Logging
+    environment: str = Field(
+        default="production",
+        description="Environment: development, staging, production",
+    )
+    log_level: str = Field(
+        default="INFO",
+        description="Log level: DEBUG, INFO, WARNING, ERROR",
+    )
+    log_file: str | None = Field(
+        default=None,
+        description="Log file path for Loki/Promtail (JSON format)",
+    )
 
     mongodb_uri: str = Field(
         default="mongodb://localhost:27017",

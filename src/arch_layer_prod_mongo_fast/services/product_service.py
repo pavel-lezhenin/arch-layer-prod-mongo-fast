@@ -6,6 +6,7 @@ import contextlib
 from typing import TYPE_CHECKING, Any
 
 from arch_layer_prod_mongo_fast.exceptions import CacheError, SearchError
+from arch_layer_prod_mongo_fast.utils import log_operation
 
 if TYPE_CHECKING:
     from arch_layer_prod_mongo_fast.models.product import (
@@ -48,6 +49,7 @@ class ProductService:
         """Generate cache key for a product."""
         return f"product:{product_id}"
 
+    @log_operation("Create product")
     async def create(self, data: ProductCreate) -> Product:
         """Create a new product with search indexing."""
         product = await self._mongo.create(data)
@@ -60,6 +62,7 @@ class ProductService:
 
         return product
 
+    @log_operation("Get product by ID")
     async def get_by_id(self, product_id: str) -> Product:
         """Get product by ID with caching."""
         cache_key = self._cache_key(product_id)
@@ -82,6 +85,7 @@ class ProductService:
 
         return product
 
+    @log_operation("Update product")
     async def update(
         self,
         product_id: str,
@@ -102,6 +106,7 @@ class ProductService:
 
         return product
 
+    @log_operation("Delete product")
     async def delete(self, product_id: str) -> None:
         """Delete product and clear cache/search."""
         await self._mongo.delete(product_id)
@@ -113,6 +118,7 @@ class ProductService:
         with contextlib.suppress(SearchError):
             await self._search.delete_document(product_id)
 
+    @log_operation("List products")
     async def list_all(
         self,
         skip: int = 0,
@@ -128,6 +134,7 @@ class ProductService:
             is_active=is_active,
         )
 
+    @log_operation("Search products")
     async def search(
         self,
         query: str,
@@ -151,6 +158,7 @@ class ProductService:
             max_price,
         )
 
+    @log_operation("Reindex all products")
     async def reindex_all(self) -> int:
         """Reindex all products in Elasticsearch."""
         products = await self._mongo.list_all(limit=10000)
