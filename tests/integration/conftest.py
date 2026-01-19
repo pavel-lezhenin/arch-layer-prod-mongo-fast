@@ -140,7 +140,7 @@ async def elasticsearch_client(
 
 
 @pytest.fixture
-async def mongo_repo(mongo_database: str) -> MongoRepository:  # noqa: ARG001
+async def mongo_repo(mongo_database: str) -> MongoRepository:
     """Create MongoDB repository with initialized Beanie."""
     return MongoRepository()
 

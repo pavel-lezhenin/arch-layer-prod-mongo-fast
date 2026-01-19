@@ -50,7 +50,7 @@ def log_operation(
                     for k, v in kwargs.items()
                     if k not in ("password", "secret", "token", "api_key")
                 }
-                extra["args"] = safe_kwargs
+                extra["call_args"] = safe_kwargs
 
             logger.debug("%s started", operation, extra=extra)
             start_time = time.perf_counter()
@@ -104,7 +104,7 @@ def log_operation_sync(
             extra: dict[str, object] = {"operation": operation}
 
             if log_args and kwargs:
-                extra["args"] = kwargs
+                extra["call_args"] = kwargs
 
             logger.debug("%s started", operation, extra=extra)
             start_time = time.perf_counter()
